@@ -1,2 +1,2 @@
-# urfd
-Universal remote flashing device
+# Universal remote flashing device
+MVP Pico flashing
