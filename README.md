@@ -69,6 +69,20 @@ unpacking the TCP/IP packets and using the PicoProbe firmware to flash
 and debug the target device.
 ![Getting Started](images/GettingStarted.svg)
 
+The socket connection depicted above will be, the debugger (Raspberry Pi Pico W) acting as the TCP server, 
+and the host machine acting as the TCP client.
+
+
+The debugger should be passive listening:
+- As a remote debugger, the Pico's primary role is to wait for debug commands from the host machine.
+- A server is designed to passively listen for incoming connections and requests, which matches the Pico's role in this setup.
+
+
+The host machine has the active role:
+- The host machine is sending debug commands.
+- This aligns well with the client role, where the client initiates communication with the server.
+
+
 ### File System
 
 
