@@ -29,6 +29,12 @@ add_executable(${ProjectName}
         debugprobe/src/get_serial.c
         debugprobe/src/sw_dp_pio.c
         debugprobe/src/tusb_edpt_handler.c
+        src/tcp_server.cpp
+        src/tcp_server.h
+        src/tcp_connections.cpp
+        src/tcp_connections.h
+        src/tcp_packet_processor.cpp
+        src/tcp_packet_processor.h
 )
 
 target_sources(${ProjectName} PRIVATE
