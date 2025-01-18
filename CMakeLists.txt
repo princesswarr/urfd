@@ -20,6 +20,9 @@ if (${PICO_SDK_VERSION_MAJOR} LESS 2)
     message(SEND_ERROR "Version 2 of the Pico SDK is required to compile this project. Please update your installation at ${PICO_SDK_PATH}")
 endif ()
 
+# copied from https://github.com/jondurrant/RPI-PicoW-WolfSSL-Exp/blob/main/HTTPSGet/CMakeLists.txt
+add_library(LWIP_PORT INTERFACE)
+
 add_executable(${ProjectName}
         debugprobe/src/probe_config.c
         src/main.cpp
@@ -50,6 +53,10 @@ target_include_directories(${ProjectName} PRIVATE
         debugprobe/CMSIS_5/CMSIS/Core/Include/
         debugprobe/include/
         debugprobe/src/
+        ${PICO_SDK_PATH}/lib/lwip/src/include/                      #lwip/sockets.h
+        ${PICO_SDK_PATH}/src/rp2_common/pico_lwip/include/          #arch/cc.h
+        ${PICO_SDK_PATH}/src/rp2_common/pico_rand/include/          #pico/rand.h
+        #${PICO_SDK_PATH}/lib/lwip/contrib/ports/freertos/include/   #arch/sys_arch.h
 )
 
 target_compile_options(${ProjectName} PRIVATE -Wall)
