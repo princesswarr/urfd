@@ -20,9 +20,6 @@ if (${PICO_SDK_VERSION_MAJOR} LESS 2)
     message(SEND_ERROR "Version 2 of the Pico SDK is required to compile this project. Please update your installation at ${PICO_SDK_PATH}")
 endif ()
 
-# copied from https://github.com/jondurrant/RPI-PicoW-WolfSSL-Exp/blob/main/HTTPSGet/CMakeLists.txt
-add_library(LWIP_PORT INTERFACE)
-
 add_executable(${ProjectName}
         debugprobe/src/probe_config.c
         src/main.cpp
@@ -38,6 +35,7 @@ add_executable(${ProjectName}
         src/tcp_connections.h
         src/tcp_packet_processor.cpp
         src/tcp_packet_processor.h
+        src/ipstack/IPStack.cpp
 )
 
 target_sources(${ProjectName} PRIVATE
@@ -98,8 +96,9 @@ target_link_libraries(${ProjectName} PRIVATE
         hardware_pio
         FreeRTOS-Kernel
         FreeRTOS-Kernel-Heap1
+        pico_cyw43_arch_lwip_sys_freertos
 )
 
-pico_set_binary_type(${ProjectName} copy_to_ram)
+#pico_set_binary_type(${ProjectName} copy_to_ram)
 
 pico_add_extra_outputs(${ProjectName})

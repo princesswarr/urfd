@@ -10,72 +10,43 @@
 */
 
 // below is AI gernated code used to test that libraries are being linked correctly
-
+#include <iostream>
+#include <cstring>
 #include "FreeRTOS.h"
 #include "task.h"
-#include "lwip/sockets.h"
-#include "lwip/inet.h"
+#include "hardware/gpio.h"
+#include "ipstack/IPStack.h"
+
+#include "hardware/timer.h"
 
 #define TCP_SERVER_PORT 50000  // Choose a port in the private/dynamic range
+#define HTTP_SERVER        "3.224.58.169"
+#define BUFSIZE 2048
+#define WIFI_SSID "franks_galaxy"
+#define WIFI_PASSWORD "veef2267"
 
 void tcp_server_task(void *pvParameters) {
-    int server_socket, client_socket;
-    struct sockaddr_in server_addr, client_addr;
-    __socklen_t client_len = sizeof(client_addr);
+    (void) pvParameters;
+    printf("i am here2\n");
+    auto *msg = "Hello, Frank!";
+    printf("\nconnecting...\n");
 
-    // 1. Create a TCP socket
-    server_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_socket < 0) {
-        printf("Error: Failed to create socket\n");
-        vTaskDelete(NULL);  // Exit task
-    }
+    unsigned char *buffer = new unsigned char[BUFSIZE];
+    // todo: Add failed connection handling
+    //IPStack ipstack("SmartIotMQTT", "SmartIot"); // example
+    IPStack ipstack(WIFI_SSID, WIFI_PASSWORD); // Set env in CLion CMAKE setting
 
-    // 2. Bind the socket to the chosen port
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_addr.s_addr = htonl(INADDR_ANY);  // Bind to all interfaces
-    server_addr.sin_port = htons(TCP_SERVER_PORT);
-
-    if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
-        printf("Error: Failed to bind socket\n");
-        close(server_socket);
-        vTaskDelete(NULL);  // Exit task
-    }
-
-    // 3. Start listening for incoming connections
-    if (listen(server_socket, 1) < 0) {  // Allow 1 queued connection
-        printf("Error: Failed to listen on socket\n");
-        close(server_socket);
-        vTaskDelete(NULL);  // Exit task
-    }
-    printf("TCP server listening on port %d\n", TCP_SERVER_PORT);
-
-    // 4. Accept incoming connections
-    while (1) {
-        printf("Waiting for a client to connect...\n");
-        client_socket = accept(server_socket, (struct sockaddr *)&client_addr, &client_len);
-        if (client_socket < 0) {
-            printf("Error: Failed to accept connection\n");
-            continue;  // Keep listening
+    while(true) {
+        int rc = ipstack.connect(HTTP_SERVER, 80);
+        if (rc == 0) {
+            ipstack.write((unsigned char *) (msg), strlen(msg), 1000);
+            auto rv = ipstack.read(buffer, BUFSIZE, 2000);
+            buffer[rv] = 0;
+            printf("rv=%d\n%s\n", rv, buffer);
+            ipstack.disconnect();
         }
-
-        printf("Client connected from IP: %s, Port: %d\n",
-               inet_ntoa(client_addr.sin_addr),
-               ntohs(client_addr.sin_port));
-
-        // Handle the client (e.g., read/write data)
-        char buffer[128];
-        int bytes_received = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
-        if (bytes_received > 0) {
-            buffer[bytes_received] = '\0';  // Null-terminate the buffer
-            printf("Received: %s\n", buffer);
+        else {
+            printf("rc from TCP connect is %d\n", rc);
         }
-
-        // Close the client connection
-        close(client_socket);
-        printf("Client disconnected\n");
     }
-
-    // Close the server socket (will not reach here in this infinite loop)
-    close(server_socket);
-    vTaskDelete(NULL);  // Exit task
 }
