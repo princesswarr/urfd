@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  *
  */
-
+extern "C" {
 #include "FreeRTOS.h"
 #include "task.h"
 
@@ -45,6 +45,7 @@
 #include "tusb_edpt_handler.h"
 #include "DAP.h"
 #include "hardware/structs/usb.h"
+}
 
 // UART0 for debugprobe debug
 // UART1 for debugprobe to target device
