@@ -60,14 +60,22 @@ target_compile_definitions(${ProjectName} PRIVATE
         PICO_RP2040_USB_DEVICE_ENUMERATION_FIX=1
 )
 
-option (DEBUG_ON_PICO "Compile firmware for the Pico instead of Debug Probe" ON)  # Adjust as needed
+option (DEBUG_ON_PICO "Compile firmware for the Pico instead of Debug Probe" ON)
 if (DEBUG_ON_PICO)
-    target_compile_definitions(${ProjectName} PRIVATE
+    target_compile_definitions (${ProjectName} PRIVATE
             DEBUG_ON_PICO=1
     )
-    set_target_properties(${ProjectName} PROPERTIES
-            OUTPUT_NAME "debugprobe_on_pico"
-    )
+    if (PICO_BOARD STREQUAL "pico_w")
+        set_target_properties(${ProjectName} PROPERTIES
+                OUTPUT_NAME "debugprobe_on_pico"
+        )
+    elseif (PICO_BOARD STREQUAL "pico2")
+        set_target_properties(${ProjectName} PROPERTIES
+                OUTPUT_NAME "debugprobe_on_pico2"
+        )
+    else ()
+        message(SEND_ERROR "Unsupported board ${PICO_BOARD}")
+    endif ()
 endif ()
 
 target_link_libraries(${ProjectName}
