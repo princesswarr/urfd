@@ -69,6 +69,34 @@ unpacking the TCP/IP packets and using the PicoProbe firmware to flash
 and debug the target device.
 ![Getting Started](images/GettingStarted.svg)
 
+The socket connection depicted above will be, the debugger (Raspberry Pi Pico W) acting as the TCP server, 
+and the host machine acting as the TCP client.
+
+
+The debugger should be passive listening:
+- As a remote debugger, the Pico's primary role is to wait for debug commands from the host machine.
+- A server is designed to passively listen for incoming connections and requests, which matches the Pico's role in this setup.
+
+
+The host machine has the active role:
+- The host machine is sending debug commands.
+- This aligns well with the client role, where the client initiates communication with the server.
+
+### Project Schematic and Setup
+This schematic illustrates the wiring of a:
+- Target Device (any ARM Cortex-M series MCU) used only during development 
+- Remote Debugger (the device being developed), 
+- Debugprobe Debugger used only for debugging and flashing during development
+- Mico SD card reader not implemented yet
+
+![SCHEMATICS](images/schematic.png)
+
+The following images show the development set up:
+<div style="display: flex; justify-content: space-around;">
+    <img src="images/development%20setup1.jpg" alt="Development Setup 1" style="max-width: 48%;"/>
+    <img src="images/development%20setup2.jpg" alt="Development Setup 2" style="max-width: 48%;"/>
+</div>
+
 ### File System
 
 

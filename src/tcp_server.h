@@ -1,0 +1,8 @@
+#ifndef PICOW_AS_REMOTE_DEBUGGER_TCP_SERVER_H
+#define PICOW_AS_REMOTE_DEBUGGER_TCP_SERVER_H
+
+void tcp_server_task(void *pvParameters);
+
+
+
+#endif //PICOW_AS_REMOTE_DEBUGGER_TCP_SERVER_H
