@@ -134,7 +134,7 @@ void init_task(void *param) {
 
 int main(void) {
     // Declare pins in binary information
-    //bi_decl_config();
+    bi_decl_config();
 
     board_init();
     usb_serial_init();

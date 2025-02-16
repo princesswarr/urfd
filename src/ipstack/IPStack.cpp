@@ -26,7 +26,12 @@ IPStack::IPStack(const char *ssid, const char *pw) : tcp_pcb{nullptr}, dropped{0
     } else {
         DEBUG_printf("Connected.\n");
     }
-
+    if (netif_default) {
+        printf("Pico W IP Address: %s\n", ip4addr_ntoa(&netif_default->ip_addr));
+        printf("Gateway IP: %s\n", ip4addr_ntoa(&netif_default->gw));
+    } else {
+        printf("Network interface not initialized!\n");
+    }
 }
 
 int IPStack::connect(uint32_t hostname, int port) {
