@@ -1,5 +1,7 @@
 #include "tcp_server.h"
 
+volatile uint32_t resp_len;
+
 void tcp_server_task(void *pvParameters) {
     auto init_complete_event = (EventGroupHandle_t*) pvParameters;
     xEventGroupWaitBits(*init_complete_event, BIT_0, pdFALSE, pdFALSE, portMAX_DELAY);
@@ -33,6 +35,8 @@ void tcp_server_task(void *pvParameters) {
     netconn_listen(server_conn);
     printf("TCP Server listening on port 50372...\n");
 
+    static uint8_t DAP_RequestCommand[512U];
+    static uint8_t DAP_ResponseCommand[512U];
     while (true) {
         // Accept an incoming connection
         err = netconn_accept(server_conn, &client_conn);
@@ -43,11 +47,17 @@ void tcp_server_task(void *pvParameters) {
             while ((err = netconn_recv(client_conn, &buf)) == ERR_OK) {
                 netbuf_data(buf, &data, &len);
                 printf("Received: %.*s\n", len, (char*)data);
+                printf("Received (Hex): ");
+                for (int i = 0; i < len; i++) {
+                    printf("%02X ", ((unsigned char*)data)[i]);
+                }
+                printf("\n");
+                memcpy(DAP_RequestCommand, data, 512U);
+                resp_len = DAP_ExecuteCommand(DAP_RequestCommand, DAP_ResponseCommand);
 
                 // Send a response
-                const char *response = "Hello, client!";
-                netconn_write(client_conn, response, strlen(response), NETCONN_COPY);
-
+                netconn_write(client_conn, DAP_ResponseCommand, 512U, NETCONN_COPY);
+                //printf("%s", dap_cmd_string[DAP_ResponseCommand[0]] );
                 netbuf_delete(buf); // Free the buffer
             }
 

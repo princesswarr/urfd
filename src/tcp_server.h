@@ -5,7 +5,9 @@
 #include "event_groups.h"
 #include "ipstack/IPStack.h"
 #include "lwip/api.h"
-
+extern "C" {
+#include "DAP.h"
+}
 #define BIT_0 (1 << 0)
 
 void tcp_server_task(void *pvParameters);
