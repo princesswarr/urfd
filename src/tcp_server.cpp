@@ -7,7 +7,7 @@ void tcp_server_task(void *pvParameters) {
     xEventGroupWaitBits(*init_complete_event, BIT_0, pdFALSE, pdFALSE, portMAX_DELAY);
 
     printf("Starting TCP Server...\n");
-
+    printf("swclk: %d, swdio: %d\n", PROBE_PIN_SWCLK, PROBE_PIN_SWDIO);
     struct netconn *server_conn, *client_conn;
     struct netbuf *buf;
     void *data;
@@ -46,17 +46,25 @@ void tcp_server_task(void *pvParameters) {
             // Receive data from the client
             while ((err = netconn_recv(client_conn, &buf)) == ERR_OK) {
                 netbuf_data(buf, &data, &len);
-                printf("Received: %.*s\n", len, (char*)data);
                 printf("Received (Hex): ");
                 for (int i = 0; i < len; i++) {
                     printf("%02X ", ((unsigned char*)data)[i]);
                 }
                 printf("\n");
+                //size_t request_len = (len > sizeof(DAP_RequestCommand)) ? sizeof(DAP_RequestCommand) : len;
                 memcpy(DAP_RequestCommand, data, 512U);
+                taskENTER_CRITICAL();
                 resp_len = DAP_ExecuteCommand(DAP_RequestCommand, DAP_ResponseCommand);
+                taskEXIT_CRITICAL();
+                printf("Response Length: %02lx\n", resp_len);
 
                 // Send a response
-                netconn_write(client_conn, DAP_ResponseCommand, 512U, NETCONN_COPY);
+                taskENTER_CRITICAL();
+                netconn_write(client_conn, DAP_ResponseCommand, (uint16_t)resp_len, NETCONN_COPY);
+                taskEXIT_CRITICAL();
+                printf("Sent: ");
+                printf("%02X ", DAP_ResponseCommand[0]); // Print each byte in uppercase hex
+                printf("\n");
                 //printf("%s", dap_cmd_string[DAP_ResponseCommand[0]] );
                 netbuf_delete(buf); // Free the buffer
             }
