@@ -60,7 +60,7 @@ and use the PicoProbe firmware to flash and debug the code on the target device.
 This method might be easier to implement 
 and reduces the processing load on the Pico W, 
 as the host machine handles most of the heavy lifting.
-![Pico W using PicoProbe Firmware](images/PicoWusingPicoProbeFirmware.svg)
+![Pico W using Debugprobe Firmware](images/PicoWusingDebugProbeFirmware.svg)
 
 To begin, we will set up a simple configuration with two Pico W devices. 
 One Pico W will handle the OpenOCD commands, wrap them in TCP/IP packets, 
@@ -92,10 +92,10 @@ This schematic illustrates the wiring of a:
 ![SCHEMATICS](images/schematic.png)
 
 The following images show the development set up:
-<div style="display: flex; justify-content: space-around;">
-    <img src="images/development%20setup1.jpg" alt="Development Setup 1" style="max-width: 48%;"/>
-    <img src="images/development%20setup2.jpg" alt="Development Setup 2" style="max-width: 48%;"/>
-</div>
+
+| ![Development Setup 1](images/development_setup1.jpg) | ![Development Setup 2](images/development_setup2.jpg) |
+|-------------------------------------------------------|-------------------------------------------------------|
+
 
 ### File System
 
