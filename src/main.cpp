@@ -125,7 +125,6 @@ void init_task(void *param) {
     auto init_complete_event = (EventGroupHandle_t*) param;
     printf("\nBoot\n");
     (IPStack(WIFI_SSID, WIFI_PASSWORD));
-    printf("bogady boo!\n");
     xEventGroupSetBits(*init_complete_event, BIT_0);
     while (true) {
         vTaskDelay(100);
