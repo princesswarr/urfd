@@ -5,7 +5,7 @@
 #include "event_groups.h"
 #include "ipstack/IPStack.h"
 #include "lwip/api.h"
-#include "board_pico_config.h"
+#include "board_debug_probe_config.h"
 extern "C" {
 #include "DAP.h"
 }
