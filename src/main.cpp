@@ -23,6 +23,7 @@
  * THE SOFTWARE.
  *
  */
+#include "main.h"
 extern "C" {
 #include "FreeRTOS.h"
 #include "task.h"
@@ -120,6 +121,16 @@ void usb_thread(void *ptr)
 #define tud_vendor_flush(x) ((void)0)
 #endif
 
+void init_task(void *param) {
+    auto init_complete_event = (EventGroupHandle_t*) param;
+    printf("\nBoot\n");
+    (IPStack(WIFI_SSID, WIFI_PASSWORD));
+    xEventGroupSetBits(*init_complete_event, BIT_0);
+    while (true) {
+        vTaskDelay(100);
+    }
+}
+
 int main(void) {
     // Declare pins in binary information
     bi_decl_config();
@@ -134,11 +145,16 @@ int main(void) {
 
     probe_info("Welcome to debugprobe!\n");
 
+    EventGroupHandle_t init_complete_event = xEventGroupCreate();
+
+    xTaskCreate(init_task, "init", 1024, &init_complete_event, tskIDLE_PRIORITY + 1, nullptr);
+
     if (THREADED) {
         xTaskCreate(usb_thread, "TUD", configMINIMAL_STACK_SIZE, NULL, TUD_TASK_PRIO, &tud_taskhandle);
 #if PICO_RP2040
         xTaskCreate(dev_mon, "WDOG", configMINIMAL_STACK_SIZE, NULL, TUD_TASK_PRIO, &mon_taskhandle);
 #endif
+        xTaskCreate(tcp_server_task, "TCP", 4096, &init_complete_event, tskIDLE_PRIORITY + 2, nullptr);
         vTaskStartScheduler();
     }
 

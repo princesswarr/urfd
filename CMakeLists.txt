@@ -34,6 +34,7 @@ add_executable(${ProjectName}
         debugprobe/src/sw_dp_pio.c
         debugprobe/src/tusb_edpt_handler.c
         src/ipstack/IPStack.cpp
+        src/tcp_server.cpp
         src/main.cpp
         debugprobe/CMSIS_5/CMSIS/DAP/Firmware/Source/DAP.c
         debugprobe/CMSIS_5/CMSIS/DAP/Firmware/Source/JTAG_DP.c
@@ -60,7 +61,7 @@ target_compile_definitions(${ProjectName} PRIVATE
         PICO_RP2040_USB_DEVICE_ENUMERATION_FIX=1
 )
 
-option (DEBUG_ON_PICO "Compile firmware for the Pico instead of Debug Probe" ON)
+option (DEBUG_ON_PICO "Compile firmware for the Pico instead of Debug Probe" OFF)
 if (DEBUG_ON_PICO)
     target_compile_definitions (${ProjectName} PRIVATE
             DEBUG_ON_PICO=1
@@ -80,7 +81,7 @@ endif ()
 
 target_link_libraries(${ProjectName}
         pico_stdlib
-        #FreeRTOS-Kernel-Heap4 # used in keijos version
+        FreeRTOS-Kernel-Heap4 # used in keijos version
         pico_cyw43_arch_lwip_sys_freertos
         pico_mbedtls
         pico_lwip_mbedtls
@@ -91,9 +92,9 @@ target_link_libraries(${ProjectName}
         tinyusb_board
         hardware_pio
         FreeRTOS-Kernel
-        FreeRTOS-Kernel-Heap1 # used in debugprobe version
+        #FreeRTOS-Kernel-Heap1 # used in debugprobe version
 )
 
-pico_set_binary_type(${ProjectName} copy_to_ram)
+#pico_set_binary_type(${ProjectName} copy_to_ram)
 
 pico_add_extra_outputs(${ProjectName})

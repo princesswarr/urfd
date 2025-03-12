@@ -5,6 +5,7 @@
 #include "pico/time.h"
 
 #include "IPStack.h"
+#include "hardware/watchdog.h"
 
 
 // To remove Pico example debugging functions during refactoring
@@ -23,10 +24,16 @@ IPStack::IPStack(const char *ssid, const char *pw) : tcp_pcb{nullptr}, dropped{0
     DEBUG_printf("Connecting to Wi-Fi...\n");
     if (cyw43_arch_wifi_connect_timeout_ms(ssid, pw, CYW43_AUTH_WPA2_AES_PSK, 30000)) {
         DEBUG_printf("Failed to connect.\n");
+        watchdog_reboot(0, 0, 1000);
     } else {
         DEBUG_printf("Connected.\n");
     }
-
+    if (netif_default) {
+        printf("Pico W IP Address: %s\n", ip4addr_ntoa(&netif_default->ip_addr));
+        printf("Gateway IP: %s\n", ip4addr_ntoa(&netif_default->gw));
+    } else {
+        printf("Network interface not initialized!\n");
+    }
 }
 
 int IPStack::connect(uint32_t hostname, int port) {
