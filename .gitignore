@@ -77,3 +77,8 @@ fabric.properties
 #Clion
 .idea/
 cmake-build-debug/
+
+#Debug logs
+BeginningSequFlashing.log
+EndSequFlashing.log
+

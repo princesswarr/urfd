@@ -12,6 +12,8 @@ void tcp_server_task(void *pvParameters) {
     void *data;
     u16_t len;
     err_t err;
+    static uint8_t DAP_RequestCommand[1024U];
+    static uint8_t DAP_ResponseCommand[1024U];
 
     // Create a new TCP connection
     server_conn = netconn_new(NETCONN_TCP);
@@ -25,6 +27,8 @@ void tcp_server_task(void *pvParameters) {
     err = netconn_bind(server_conn, IP_ADDR_ANY, 50372);
     if (err != ERR_OK) {
         printf("Error: netconn_bind failed with code %d\n", err);
+        uint8_t request[1] = { ID_DAP_Disconnect };
+        DAP_ExecuteCommand(request, DAP_ResponseCommand);
         netconn_delete(server_conn);
         vTaskDelete(nullptr);
         return;
@@ -34,13 +38,13 @@ void tcp_server_task(void *pvParameters) {
     netconn_listen(server_conn);
     printf("TCP Server listening on port 50372...\n");
 
-    static uint8_t DAP_RequestCommand[1024U];
-    static uint8_t DAP_ResponseCommand[1024U];
     while (true) {
         // Accept an incoming connection
         err = netconn_accept(server_conn, &client_conn);
         if (err == ERR_OK) {
             printf("Client connected!\n");
+            uint8_t connect_request[1] = { ID_DAP_Connect };
+            DAP_ExecuteCommand(connect_request, DAP_ResponseCommand);
 
             // Receive data from the client
             while ((err = netconn_recv(client_conn, &buf)) == ERR_OK) {
@@ -54,7 +58,11 @@ void tcp_server_task(void *pvParameters) {
                 taskEXIT_CRITICAL();
                 netbuf_delete(buf); // Free the buffer
             }
-
+            if (err != ERR_OK) {
+                printf("netconn_recv failed with error %d\n", err);
+                uint8_t request[1] = { ID_DAP_Disconnect };
+                DAP_ExecuteCommand(request, DAP_ResponseCommand);
+            }
             // Close the connection
             netconn_close(client_conn);
             netconn_delete(client_conn);
